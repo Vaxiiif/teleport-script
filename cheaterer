@@ -198,6 +198,18 @@ end
 
 -- MISC TAB
 local miscPage = createTab("Misc")
+
+-- Discord Button (first)
+createButton(miscPage,"Join Discord",function()
+    setclipboard("https://discord.gg/4W9mwVJR5m")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Discord Invite",
+        Text = "Link copied to clipboard!",
+        Duration = 5
+    })
+end)
+
+-- Label (second)
 local label = Instance.new("TextLabel")
 label.Size = UDim2.new(1,0,0,30)
 label.BackgroundTransparency = 1
