@@ -1,0 +1,252 @@
+-- LocalScript (StarterPlayerScripts)
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Main ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Babalone"
+screenGui.Parent = playerGui
+screenGui.ResetOnSpawn = false
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 480, 0, 500)
+mainFrame.Position = UDim2.new(0.5, -240, 0.5, -250)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20,22,35)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- Rounded corners + shadow
+local uICorner = Instance.new("UICorner")
+uICorner.CornerRadius = UDim.new(0, 20)
+uICorner.Parent = mainFrame
+
+local uiGradient = Instance.new("UIGradient")
+uiGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(28,28,40)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20,22,35))
+}
+uiGradient.Rotation = 45
+uiGradient.Parent = mainFrame
+
+local uiStroke = Instance.new("UIStroke")
+uiStroke.Thickness = 2
+uiStroke.Color = Color3.fromRGB(15,15,20)
+uiStroke.Transparency = 0.6
+uiStroke.Parent = mainFrame
+
+-- Top Bar
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 50)
+topBar.BackgroundColor3 = Color3.fromRGB(20,22,35)
+topBar.BorderSizePixel = 0
+topBar.Parent = mainFrame
+
+local topGradient = Instance.new("UIGradient")
+topGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(58,123,213)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(33,37,50))
+}
+topGradient.Rotation = 90
+topGradient.Parent = topBar
+
+local topTitle = Instance.new("TextLabel")
+topTitle.Size = UDim2.new(1, -60, 1, 0)
+topTitle.Position = UDim2.new(0, 20, 0, 0)
+topTitle.BackgroundTransparency = 1
+topTitle.Text = "BabaloneHub"
+topTitle.Font = Enum.Font.Merriweather
+topTitle.TextSize = 24
+topTitle.TextColor3 = Color3.fromRGB(245,245,230)
+topTitle.TextXAlignment = Enum.TextXAlignment.Left
+topTitle.Parent = topBar
+
+-- Close Button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 40, 0, 40)
+closeBtn.Position = UDim2.new(1, -50, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 20
+closeBtn.Parent = topBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 10)
+closeCorner.Parent = closeBtn
+
+closeBtn.MouseButton1Click:Connect(function()
+    screenGui.Enabled = false
+end)
+
+-- Tabs Frame
+local tabsFrame = Instance.new("Frame")
+tabsFrame.Size = UDim2.new(1, 0, 0, 50)
+tabsFrame.Position = UDim2.new(0, 0, 0, 50)
+tabsFrame.BackgroundTransparency = 1
+tabsFrame.Parent = mainFrame
+
+local tabLayout = Instance.new("UIListLayout")
+tabLayout.FillDirection = Enum.FillDirection.Horizontal
+tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tabLayout.Padding = UDim.new(0, 8)
+tabLayout.Parent = tabsFrame
+
+-- Content Container
+local contentFrame = Instance.new("Frame")
+contentFrame.Size = UDim2.new(1, -20, 1, -120)
+contentFrame.Position = UDim2.new(0, 10, 0, 110)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- Tab system
+local tabPages = {}
+
+local function createTab(name)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 120, 1, 0)
+    button.Text = name
+    button.Font = Enum.Font.Merriweather
+    button.TextSize = 18
+    button.BackgroundColor3 = Color3.fromRGB(40,45,65)
+    button.TextColor3 = Color3.fromRGB(245,245,230)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = button
+    button.Parent = tabsFrame
+
+    local page = Instance.new("ScrollingFrame")
+    page.Size = UDim2.new(1,0,1,0)
+    page.BackgroundTransparency = 1
+    page.Visible = false
+    page.ScrollBarThickness = 6
+    page.Parent = contentFrame
+
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0,10)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = page
+
+    tabPages[name] = page
+
+    button.MouseEnter:Connect(function() button.BackgroundColor3 = Color3.fromRGB(75,135,220) end)
+    button.MouseLeave:Connect(function() button.BackgroundColor3 = Color3.fromRGB(40,45,65) end)
+
+    button.MouseButton1Click:Connect(function()
+        for _,p in pairs(tabPages) do p.Visible = false end
+        page.Visible = true
+    end)
+
+    return page
+end
+
+-- Premium button creator
+local function createButton(parent, name, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1,0,0,32)
+    btn.BackgroundColor3 = Color3.fromRGB(45,50,70)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(245,245,245)
+    btn.Font = Enum.Font.Merriweather
+    btn.TextSize = 16
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0,10)
+    corner.Parent = btn
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(90,160,255)
+    stroke.Thickness = 1
+    stroke.Transparency = 0.6
+    stroke.Parent = btn
+
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(70,100,160)
+        stroke.Transparency = 0.3
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(45,50,70)
+        stroke.Transparency = 0.6
+    end)
+
+    btn.MouseButton1Click:Connect(callback)
+    btn.Parent = parent
+end
+
+-- TELEPORT TAB
+local teleportPage = createTab("Teleports")
+local teleportLocations = {
+    ["Spawn Point"] = Vector3.new(-53.62,2.66,1399.22),
+    ["Pompeii"] = Vector3.new(-853.12,0.06,1152.15),
+    ["Djem Island"] = Vector3.new(-2064.88,29.16,-260.71),
+    ["Floating City"] = Vector3.new(-2269.77,-14.03,-2222.42),
+    ["Etna Volcano"] = Vector3.new(-1178.50,-10.94,-3026.27),
+    ["Swamp of Learna"] = Vector3.new(329.31,-2.01,-2833.65),
+    ["Mount Olympus"] = Vector3.new(1049.69,106.32,-1176.89),
+    ["Rome"] = Vector3.new(-931.27,10.45,-1478.15)
+}
+
+for name,pos in pairs(teleportLocations) do
+    createButton(teleportPage,name,function()
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            player.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
+        end
+    end)
+end
+
+-- MISC TAB
+local miscPage = createTab("Misc")
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1,0,0,30)
+label.BackgroundTransparency = 1
+label.Text = "Made by shedontfwz"
+label.Font = Enum.Font.Merriweather
+label.TextSize = 16
+label.TextColor3 = Color3.fromRGB(245,245,230)
+label.Parent = miscPage
+
+-- Default tab
+tabPages["Teleports"].Visible = true
+
+-- RightControl toggle
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.RightControl then
+        screenGui.Enabled = not screenGui.Enabled
+    end
+end)
+
+-- DRAGGING
+local dragging, dragInput, dragStart, startPos
+local function update(input)
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+topBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+topBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
